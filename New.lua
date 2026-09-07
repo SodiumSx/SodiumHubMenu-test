@@ -763,13 +763,10 @@ local function makeTab(name, icon, lo)
 end
 
 -- build sidebar nav
-sideLabel("  MAIN")
-makeTab("Combat",   "?", 2)
-makeTab("Visuals",  "?", 3)
-makeTab("Player",   "?", 4)
-sideLabel("  MISC")
-makeTab("Settings", "?", 6)
-makeTab("Scripts",  "?", 7)
+-- THEM TAB MOI: sideLabel + makeTab (so thu tu tang dan)
+-- Vi du:
+-- sideLabel("  MAIN")
+-- makeTab("Farm", "?", 2)
 
 -- o tim kiem tren cung tab trai (loc tab theo ten)
 local searchBox = frame(Sidebar, UDim2.new(1, -12, 0, 26), UDim2.fromOffset(6, 56), C.panel)
@@ -2444,107 +2441,17 @@ local function rowTag(parent, title, tagTxt, tagCol)
 	regFeature(title, c)
 end
 
---========================== PAGE: COMBAT ==========================--
-do
-	local L, R = makePage("Combat")
-
-	secLabel(L, "AIMBOT")
-	rowToggle(L, "Enabled", true)
-	rowSlider(L, "FOV", 180, "", 0, 360)
-	rowBadge(L, "Aim Key",    "RMB")
-	rowBadge(L, "Target Part","Head")
-	rowSlider(L, "Smoothness", 3.1, "", 0, 10)
-	rowSlider(L, "Prediction",  0.70, "", 0, 2)
-
-	rowDiv(L)
-	secLabel(L, "SILENT AIM")
-	rowTag(L,   "Silent Aim",   "DETECTED", Color3.fromRGB(180, 60, 60))
-	rowSlider(L, "Hit Chance",  80, "%", 0, 100)
-
-	secLabel(R, "VISUALS")
-	rowToggle(R, "Draw FOV Circle", true)
-	rowSlider(R, "FOV Thickness",   1.5, "", 0.5, 5)
-	rowToggle(R, "Target Indicator", false)
-	rowToggle(R, "Hit Marker",      true)
-	rowToggle(R, "Hit Marker Sound",true)
-
-	rowDiv(R, "EXTRA")
-	secLabel(R, "SETTINGS")
-	rowToggle(R, "Team Check",   true)
-	rowToggle(R, "Wall Check",   false)
-	rowBadge(R,  "Target Priority", "Nearest")
-end
-
---========================== PAGE: VISUALS ==========================--
-do
-	local L, R = makePage("Visuals")
-	secLabel(L, "ESP")
-	rowToggle(L, "Player ESP",   true)
-	rowToggle(L, "Box ESP",      true)
-	rowToggle(L, "Skeleton",     false)
-	rowSlider(L, "ESP Distance", 800, "", 100, 2000)
-	rowToggle(L, "Name Tag",     true)
-	rowToggle(L, "Health Bar",   true)
-
-	secLabel(R, "CHAMS")
-	rowToggle(R, "Player Chams",   false)
-	rowToggle(R, "Through Walls",  false)
-	rowToggle(R, "Rainbow Chams",  false)
-	rowSlider(R, "Chams Alpha", 80, "%", 0, 100)
-end
-
---========================== PAGE: PLAYER ==========================--
-do
-	local L, R = makePage("Player")
-	secLabel(L, "MOVEMENT")
-	rowToggle(L, "Speed Hack",    false)
-	rowSlider(L, "Walk Speed",    16, "", 16, 200)
-	rowToggle(L, "Fly",           false)
-	rowToggle(L, "No Clip",       false)
-	rowSlider(L, "Fly Speed",     50, "", 10, 300)
-
-	secLabel(R, "MISC")
-	rowToggle(R, "Infinite Jump", false)
-	rowToggle(R, "Anti-Void",     true)
-	rowToggle(R, "No Fall Damage",true)
-	rowToggle(R, "Anti-AFK",      true)
-end
-
---========================== PAGE: SETTINGS ==========================--
-do
-	local L, R = makePage("Settings")
-	secLabel(L, "KEYBINDS")
-	rowBadge(L, "Toggle Menu",   "INSERT")
-	rowBadge(L, "Toggle Aimbot", "F1")
-	rowBadge(L, "Toggle ESP",    "F2")
-	rowBadge(L, "Fly Toggle",    "F3")
-	rowDropSingle(L, "Aim Part", {"Head", "Torso", "Random"}, "Head")
-	rowDropMulti(L, "ESP Show", {"Name", "Box", "Health"}, {"Name", "Box"})
-	rowColorPicker(L, "UI Accent", "#DC2626")
-
-	secLabel(R, "CONFIG")
-	rowTag(R, "Save Config",  "SAVED",   Color3.fromRGB(40, 140, 80))
-	rowTag(R, "Load Config",  "DEFAULT", Color3.fromRGB(100, 60, 200))
-	rowTag(R, "Reset All",    "DANGER",  Color3.fromRGB(180, 60, 60))
-end
-
---========================== PAGE: SCRIPTS ==========================--
-do
-	local L, R = makePage("Scripts")
-	secLabel(L, "QUICK SCRIPTS")
-	rowToggle(L, "Auto Farm",    false)
-	rowToggle(L, "Auto Collect", false)
-	rowToggle(L, "Auto Sell",    false)
-	rowToggle(L, "Auto Quest",   false)
-
-	secLabel(R, "EXECUTOR")
-	rowTag(R,   "Script Hub",   "ONLINE",  Color3.fromRGB(40, 140, 80))
-	rowToggle(R, "Auto Execute", false)
-	rowPara(R, "Ghi chú", "Bật Auto Execute để tự chạy script khi mở menu.")
-	rowButton(R, "Test Notify", "Bấm để hiện thông báo test ở dưới", function()
-		_G.NEXUS_Notify("SodiumHub", "Đây là thông báo test!", 2, "bottom")
-	end)
-end
+--========================== PAGES (them noi dung tab o day) ==========================--
+-- Mau them tab moi:
+-- do
+-- 	local L, R = makePage("Farm") -- L = cot trai, R = cot phai
+-- 	secLabel(L, "AUTO FARM")
+-- 	rowToggle(L, "Auto Farm", false, function(v) _G.AutoFarm = v end)
+-- 	rowSlider(L, "Farm Speed", 50, "", 0, 200, nil, function(v) print(v) end)
+-- 	rowButton(R, "Test Notify", "Bam de hien thong bao", function()
+-- 		_G.NEXUS_Notify("SodiumHub", "Day la thong bao test!", 2, "bottom")
+-- 	end)
+-- end
 
 --========================== SELECT DEFAULT TAB ==========================--
 local function selectTab(name)
@@ -2565,7 +2472,12 @@ for name, tb in pairs(tabButtons) do
 	end)
 end
 
-selectTab("Combat")
+-- chon tab dau tien neu co (khong con mac dinh "Combat" demo)
+do
+	local first = nil
+	for name in pairs(tabButtons) do first = first or name break end
+	if first then selectTab(first) else tbTitle.Text = "Menu" end
+end
 
 --========================== TOPBAR: NUT TAT / THU NHO ==========================--
 do
