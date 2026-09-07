@@ -764,9 +764,6 @@ end
 
 -- build sidebar nav
 -- THEM TAB MOI: sideLabel + makeTab (so thu tu tang dan)
--- Vi du:
--- sideLabel("  MAIN")
--- makeTab("Farm", "?", 2)
 
 -- o tim kiem tren cung tab trai (loc tab theo ten)
 local searchBox = frame(Sidebar, UDim2.new(1, -12, 0, 26), UDim2.fromOffset(6, 56), C.panel)
@@ -2442,16 +2439,7 @@ local function rowTag(parent, title, tagTxt, tagCol)
 end
 
 --========================== PAGES (them noi dung tab o day) ==========================--
--- Mau them tab moi:
--- do
--- 	local L, R = makePage("Farm") -- L = cot trai, R = cot phai
--- 	secLabel(L, "AUTO FARM")
--- 	rowToggle(L, "Auto Farm", false, function(v) _G.AutoFarm = v end)
--- 	rowSlider(L, "Farm Speed", 50, "", 0, 200, nil, function(v) print(v) end)
--- 	rowButton(R, "Test Notify", "Bam de hien thong bao", function()
--- 		_G.NEXUS_Notify("SodiumHub", "Day la thong bao test!", 2, "bottom")
--- 	end)
--- end
+-- Trang nay de trong: tab them qua API CreateTab o cuoi file.
 
 --========================== SELECT DEFAULT TAB ==========================--
 local function selectTab(name)
@@ -2847,11 +2835,108 @@ print("[NEXUS] Loaded. Nhan INSERT / nut tron NX de tat-mo menu. Toggle da bam d
 --   local NexusLib = loadstring(game:HttpGet("LINK_RAW_CUA_BAN"))()
 --   local Lib = NexusLib.new()
 --   Lib:Notify("Tieu de", "Noi dung", 2)
+--   local Win = Lib:CreateWindow({ Title = "Sodium Hub", Subtitle = "test" })
+--   local Tab = Win:CreateTab({ Title = "Main" })
+--   Tab:CreateSection({ Text = "Visual", Side = 1 })
+--   Tab:CreateToggle({ Title = "ESP", Side = 1, Callback = function(v) end })
 -- Luu y: file tu dung UI ngay khi load (giong cu), table tra ve chi de goi API.
 local NexusLib = {}
 NexusLib.__index = NexusLib
 function NexusLib.new()
 	return setmetatable({}, NexusLib)
+end
+
+--========================== OBJECT API (kieu CustomMenu / ProxyLib) ==========================--
+-- local Win = Lib:CreateWindow({ Title = "Sodium Hub", Subtitle = "test" })
+-- local Tab = Win:CreateTab({ Title = "Main" })
+-- Tab:CreateSection({ Text = "Visual", Side = 1 })
+-- Tab:CreateToggle({ Title = "ESP", Side = 1, Callback = function(v) end })
+local __apiTabOrder = 0
+
+function NexusLib:CreateWindow(opt)
+	opt = opt or {}
+	pcall(function()
+		if opt.Subtitle ~= nil and logoSub then
+			logoSub.Text = tostring(opt.Subtitle)
+		end
+	end)
+	local Win = {}
+	function Win:CreateTab(o)
+		o = o or {}
+		local name = o.Title or "Tab"
+		__apiTabOrder = __apiTabOrder + 1
+		makeTab(name, o.Icon or "?", __apiTabOrder)
+		local L, R = makePage(name)
+		local tb = tabButtons[name]
+		if tb then
+			tb.row.InputBegan:Connect(function(i)
+				if i.UserInputType == Enum.UserInputType.MouseButton1 then
+					selectTab(name)
+				end
+			end)
+		end
+		if __apiTabOrder == 1 then selectTab(name) end
+		local Tab = {}
+		local function col(s) if s == 2 then return R else return L end end
+		local function sideOf(o2) return (o2 and o2.Side) or 1 end
+		function Tab:CreateSection(o2)
+			o2 = o2 or {}
+			secLabel(col(sideOf(o2)), o2.Text or "SECTION")
+		end
+		function Tab:CreateLine(o2)
+			o2 = o2 or {}
+			if type(o2) == "string" then return rowDiv(col(1), o2) end
+			return rowDiv(col(sideOf(o2)), o2.Text)
+		end
+		function Tab:CreateToggle(o2)
+			o2 = o2 or {}
+			return rowToggle(col(sideOf(o2)), o2.Title or "Toggle",
+				o2.Default == true, o2.Desc or o2.Description, o2.Callback)
+		end
+		function Tab:CreateSlider(o2)
+			o2 = o2 or {}
+			return rowSlider(col(sideOf(o2)), o2.Title or "Slider",
+				o2.Default or o2.Min or 0, o2.Suffix or "",
+				o2.Min or 0, o2.Max or 100, nil, o2.Callback)
+		end
+		function Tab:CreateButton(o2)
+			o2 = o2 or {}
+			return rowButton(col(sideOf(o2)), o2.Title or "Button",
+				o2.Desc or o2.Description, o2.Callback)
+		end
+		function Tab:CreateParagraph(o2)
+			o2 = o2 or {}
+			return rowPara(col(sideOf(o2)), o2.Title, o2.Desc or o2.Description)
+		end
+		function Tab:CreateDropdown(o2)
+			o2 = o2 or {}
+			if o2.Multi then
+				return rowDropMulti(col(sideOf(o2)), o2.Title or "Dropdown",
+					o2.Options or {}, o2.Default or {}, o2.Callback)
+			end
+			return rowDropSingle(col(sideOf(o2)), o2.Title or "Dropdown",
+				o2.Options or {}, o2.Default, o2.Callback)
+		end
+		function Tab:CreateColorPicker(o2)
+			o2 = o2 or {}
+			return rowColorPicker(col(sideOf(o2)), o2.Title or "Color",
+				o2.Default, o2.Callback)
+		end
+		function Tab:CreateKeybind(o2)
+			o2 = o2 or {}
+			local def = o2.Default
+			if typeof(def) == "EnumItem" then def = def.Name end
+			return rowBadge(col(sideOf(o2)), o2.Title or "Keybind",
+				def or "-", nil, o2.Callback)
+		end
+		return Tab
+	end
+	function Win:Notify(o)
+		if type(o) == "table" then
+			return _G.NEXUS_Notify(o.Title, o.Desc or o.Description, o.Time or o.Duration)
+		end
+	end
+	return Win
 end
 function NexusLib:Notify(title, text, dur, where)
 	return _G.NEXUS_Notify(title, text, dur, where)
