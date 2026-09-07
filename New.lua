@@ -373,13 +373,8 @@ function MyMenu:CreateWindow(opt)
                 end
             end
             rf()
-            local function toggle()
+            sw.MouseButton1Click:Connect(function()
                 st = not st rf() pcall(cb, st)
-            end
-            sw.MouseButton1Click:Connect(toggle)
-            -- bam ca khung cung toggle cho de
-            f.InputBegan:Connect(function(i)
-                if i.UserInputType == Enum.UserInputType.MouseButton1 then toggle() end
             end)
             local api = {}
             function api:Set(v) st = (v == true) rf() pcall(cb, st) end
